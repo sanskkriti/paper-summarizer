@@ -2,7 +2,7 @@ import os
 os.environ["TRANSFORMERS_NO_TF"] = "1"
 
 import streamlit as st
-import fitz  # PyMuPDF
+import pdfplumber
 from transformers import pipeline
 
 # Load the summarization pipeline (uses PyTorch backend)
@@ -14,9 +14,8 @@ summarizer = pipeline(
 )
 
 def extract_text_from_pdf(file):
-    """Extract text from each page of the uploaded PDF."""
-    with fitz.open(stream=file.read(), filetype="pdf") as doc:
-        return "".join(page.get_text() for page in doc)
+    with pdfplumber.open(file) as pdf:
+        return "".join(page.extract_text() or "" for page in pdf.pages)
 
 def get_summary(text):
     """Generate a more detailed summary from extracted text."""
